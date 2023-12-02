@@ -1271,3 +1271,12 @@ class ProductRecommendations extends HTMLElement {
 }
 
 customElements.define('product-recommendations', ProductRecommendations);
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  if(window.location.href.includes('/products')){
+    const unselectOption = document.querySelector("option[value='Unselect']");
+    const aTCdisable = document.querySelector('[name="add"]');
+    unselectOption.selected = true;
+    aTCdisable.disabled = true;
+  }
+})
