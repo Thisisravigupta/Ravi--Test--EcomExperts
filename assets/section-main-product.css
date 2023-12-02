@@ -277,6 +277,15 @@ fieldset.product-form__input .form__label {
   max-width: 25rem;
 }
 
+variant-selects .product-form__input:first-child .select::after{
+  border: none;
+  box-shadow: none;
+}
+
+.select__radio ~ label {
+  width: 50px;
+  height: 50px;
+}
 .product-form__submit {
   margin-bottom: 1rem;
 }

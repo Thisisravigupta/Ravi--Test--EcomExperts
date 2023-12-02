@@ -972,7 +972,14 @@ class VariantSelects extends HTMLElement {
   }
 
   updateOptions() {
-    this.options = Array.from(this.querySelectorAll('select'), (select) => select.value);
+    this.options = Array.from(this.querySelectorAll('input:checked, select'), (input) => {
+      if (input.tagName === 'SELECT') {
+        return input.value;
+      } else if (input.tagName === 'INPUT' && input.type === 'radio') {
+        return input.value
+      }
+    });
+    console.log(this.options)
   }
 
   updateMasterId() {
