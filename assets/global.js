@@ -976,7 +976,7 @@ class VariantSelects extends HTMLElement {
       if (input.tagName === 'SELECT') {
         return input.value;
       } else if (input.tagName === 'INPUT' && input.type === 'radio') {
-        return input.value
+        return input.value;
       }
     });
     console.log(this.options)
