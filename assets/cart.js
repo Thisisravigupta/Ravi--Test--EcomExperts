@@ -103,7 +103,7 @@ class CartItems extends HTMLElement {
     ];
   }
 
-  updateQuantity(line, quantity, name, variantId) {
+  async updateQuantity(line, quantity, name, variantId) {
     this.enableLoading(line);
 
     const body = JSON.stringify({
@@ -112,6 +112,37 @@ class CartItems extends HTMLElement {
       sections: this.getSectionsToRender().map((section) => section.section),
       sections_url: window.location.pathname,
     });
+
+    let checkVariantId = variantId;
+    const blackMediumId = "44150049571028";
+    const freeBieVarintId = "44149359771860";
+
+    if(!checkVariantId){
+      const lineElStr = `#CartDrawer-Item-${line}`
+      const lineEl = document.querySelector(lineElStr);
+      checkVariantId = lineEl.getAttribute('variantId')
+    }
+
+    let updateCart = {
+      'id': freeBieVarintId,
+      'quantity': quantity
+    }
+
+    if (blackMediumId === checkVariantId) {
+      await fetch(window.Shopify.routes.root + 'cart/change.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateCart)
+      })
+        .then(response => {
+          return response.json();
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    }
 
     fetch(`${routes.cart_change_url}`, { ...fetchConfig(), ...{ body } })
       .then((response) => {
