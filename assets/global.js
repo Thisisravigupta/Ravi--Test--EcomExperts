@@ -936,7 +936,7 @@ class SlideshowComponent extends SliderComponent {
     const slideScrollPosition =
       this.slider.scrollLeft +
       this.sliderFirstItemNode.clientWidth *
-        (this.sliderControlLinksArray.indexOf(event.currentTarget) + 1 - this.currentPage);
+      (this.sliderControlLinksArray.indexOf(event.currentTarget) + 1 - this.currentPage);
     this.slider.scrollTo({
       left: slideScrollPosition,
     });
@@ -972,7 +972,25 @@ class VariantSelects extends HTMLElement {
   }
 
   updateOptions() {
-    this.options = Array.from(this.querySelectorAll('select'), (select) => select.value);
+    this.options = Array.from(this.querySelectorAll('input:checked, select'), (input) => {
+      if (input.tagName === 'SELECT') {
+        return input.value;
+      } else if (input.tagName === 'INPUT' && input.type === 'radio') {
+        return input.value;
+      }
+    });
+
+    let atcBtns = document.querySelectorAll(".product-form__buttons button");
+
+    if (this.options[1] === "Unselect") {
+      atcBtns.forEach(button => {
+        button.disabled = true;
+      });
+    } else {
+      atcBtns.forEach(button => {
+        button.disabled = false;
+      });
+    }
   }
 
   updateMasterId() {
@@ -1073,8 +1091,7 @@ class VariantSelects extends HTMLElement {
     const sectionId = this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section;
 
     fetch(
-      `${this.dataset.url}?variant=${requestedVariantId}&section_id=${
-        this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section
+      `${this.dataset.url}?variant=${requestedVariantId}&section_id=${this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section
       }`
     )
       .then((response) => response.text())
@@ -1157,17 +1174,20 @@ class VariantSelects extends HTMLElement {
     const addButton = productForm.querySelector('[name="add"]');
     const addButtonText = productForm.querySelector('[name="add"] > span');
     if (!addButton) return;
-
+  
     if (disable) {
       addButton.setAttribute('disabled', 'disabled');
       if (text) addButtonText.textContent = text;
     } else {
-      addButton.removeAttribute('disabled');
-      addButtonText.textContent = window.variantStrings.addToCart;
+      if (this.options[1] !== "Unselect") {
+        addButton.removeAttribute('disabled');
+        addButtonText.textContent = window.variantStrings.addToCart;
+      }
     }
-
+  
     if (!modifyClass) return;
   }
+  
 
   setUnavailable() {
     const button = document.getElementById(`product-form-${this.dataset.section}`);
@@ -1264,3 +1284,12 @@ class ProductRecommendations extends HTMLElement {
 }
 
 customElements.define('product-recommendations', ProductRecommendations);
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.location.href.includes('/products')) {
+    const unselectOption = document.querySelector("option[value='Unselect']");
+    const aTCdisable = document.querySelector('[name="add"]');
+    unselectOption.selected = true;
+    aTCdisable.disabled = true;
+  }
+})

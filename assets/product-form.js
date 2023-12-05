@@ -16,7 +16,7 @@ if (!customElements.get('product-form')) {
         this.hideErrors = this.dataset.hideErrors === 'true';
       }
 
-      onSubmitHandler(evt) {
+      async onSubmitHandler(evt) {
         evt.preventDefault();
         if (this.submitButton.getAttribute('aria-disabled') === 'true') return;
 
@@ -31,6 +31,10 @@ if (!customElements.get('product-form')) {
         delete config.headers['Content-Type'];
 
         const formData = new FormData(this.form);
+        const selectedVariantId = this.form.querySelector('input[name="id"]').value;
+        const blackMediumId = "44150049571028";
+        const freeBieVarintId = "44149359771860";
+
         if (this.cart) {
           formData.append(
             'sections',
@@ -40,6 +44,29 @@ if (!customElements.get('product-form')) {
           this.cart.setActiveElement(document.activeElement);
         }
         config.body = formData;
+
+        let formDataFreeBie = {
+          'items': [{
+            'id': freeBieVarintId,
+            'quantity': 1
+          }]
+        };
+
+        if (blackMediumId === selectedVariantId) {
+          await fetch(window.Shopify.routes.root + 'cart/add.js', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formDataFreeBie)
+          })
+            .then(response => {
+              return response.json();
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+        }
 
         fetch(`${routes.cart_add_url}`, config)
           .then((response) => response.json())
